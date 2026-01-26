@@ -1,0 +1,33 @@
+# Virtual environment
+.venv/
+venv/
+
+# Dataset and images
+data/
+test_images/
+
+# Checkpoints and trained models
+checkpoints/
+*.h5
+*.pth
+*.pt
+*.ckpt
+
+# Medical imaging formats
+*.nii
+*.nii.gz
+*.dcm
+
+# Python cache
+__pycache__/
+**/__pycache__/
+.ipynb_checkpoints/
+
+# Logs and temp files
+*.log
+loss.txt
+
+# OS junk
+Thumbs.db
+.DS_Store
+
