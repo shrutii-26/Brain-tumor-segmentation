@@ -1,250 +1,137 @@
+# BrainSeg
 
-#Brain Tumor Segmentation Using U-Net
+**Brain Tumor Segmentation Pipeline — Upload an MRI scan, get an automated tumor segmentation mask.**
+Built with U-Net · PyTorch · Albumentations · OpenCV
 
-A complete deep-learning pipeline for brain tumor segmentation using MRI images and the U-Net architecture.
-This project performs dataset loading, preprocessing, training, evaluation, and prediction using PyTorch.
+## What It Does
 
-🔍 Project Overview
+1. Load MRI scans with their corresponding tumor masks
+2. Preprocess and augment the data automatically
+3. U-Net trains on the prepared dataset with combined BCE + Dice loss
+4. Evaluate segmentation quality using Dice, IoU, and Accuracy
+5. Predict tumor masks on new MRI images
 
-This project aims to create an automated system that detects and segments brain tumors from MRI scans.
-It uses a U-Net convolutional neural network, ideal for medical image segmentation because of its symmetric encoder–decoder structure and spatial skip connections.
+## Pipeline
 
-📁 Project Structure
+```
+MRI Image Input
+        ↓
+Dataset Loader         → auto image-mask pairing, tensor conversion
+        ↓
+Preprocessing          → normalization, binarization, augmentation
+        ↓
+U-Net (PyTorch)        → encoder-decoder with skip connections
+        ↓
+Loss (BCE + Dice)      → pixel-wise + overlap-based optimization
+        ↓
+Output                 → segmented tumor mask + evaluation metrics
+```
+
+## Key Features
+
+| Feature                 | Detail                                                    |
+| ----------------------- | --------------------------------------------------------- |
+| Auto image–mask pairing | Detects and matches MRI scans with masks                  |
+| Preprocessing           | Normalization + mask binarization                         |
+| Augmentation            | Flips, rotations, elastic transforms, brightness/contrast |
+| Architecture            | U-Net with sigmoid output                                 |
+| Loss Function           | 0.3 × BCE + 0.7 × Dice                                    |
+| Evaluation Metrics      | Dice Score, IoU, Pixel Accuracy                           |
+| Best Model Saving       | Auto-saves to `checkpoints/best_unet.pth`                 |
+| Loss Visualization      | Training + validation curve plotting                      |
+
+## Tech Stack
+
+| Component        | Technology                    |
+| ---------------- | ----------------------------- |
+| Deep Learning    | PyTorch                       |
+| Architecture     | U-Net (custom implementation) |
+| Augmentation     | Albumentations                |
+| Image Processing | OpenCV + PIL                  |
+| Dataset          | LGG Brain MRI Segmentation    |
+| Loss Functions   | BCE + Dice (combined)         |
+
+## Project Structure
+
+```
 project/
-│── dataset.py
-│── preprocessing.py
-│── train.py
-│── evaluate.py
-│── test_images.py
-│── test_dataset.py
-│── model.py
-│── plot_loss_from_txt.py
-│── checkpoints/
-│── results_training/
-│── README.md
-
-📌 Key Features
-
-✔ Automatic image–mask pairing
-✔ Preprocessing: normalization, thresholding
-✔ Data augmentation using flips, rotations, elastic transforms
-✔ U-Net (PyTorch) architecture
-✔ Combined BCE + Dice loss
-✔ Evaluation metrics: Dice, IoU, Accuracy
-✔ Testing script for predictions
-✔ Loss curve visualization
-
-🚀 Pipeline
-
-Dataset Loading
-
-Preprocessing & Augmentation
-
-Training U-Net
-
-Validation & Saving Best Model
-
-Evaluation on Test Data
-
-Predicting Masks for New MRI Images
-
-📦 1. Dataset
-
-The project uses the LGG Brain MRI Segmentation Dataset.
-
-Each MRI slice includes:
-
-Grayscale .tif MRI image
-
-Tumor mask (_mask.tif or _seg.tif)
-
-dataset.py automatically:
-
-Detects all MRI files
-
-Matches each scan with its correct mask
-
-Converts to tensors
-
-Normalizes images
-
-Applies Torch augmentations
-
-🧪 2. Preprocessing
-
-Implemented in preprocessing.py & dataset.py.
-
-Includes:
-
-✔ Image Normalization
-
-Normalize pixel intensities → [0, 1]
-
-✔ Mask Binarization
-
-Convert segmentation mask → 0 or 1
-
-✔ Augmentation
-
-Horizontal flip
-
-Vertical flip
-
-Random rotation
-
-Elastic transform
-
-Brightness/contrast adjustment
-
-These prevent overfitting and improve generalization.
-
-🧠 3. Model — U-Net
-
-Defined in model.py.
-
-Architecture Overview
-
-Encoder: Downsampling with Conv → Conv → MaxPool
-
-Bottleneck: High-level features extracted
-
-Decoder: Upsampling + Skip Connections
-
-Output: 1-channel segmented tumor mask
-
-Final activation:
-Sigmoid → outputs probabilities between 0 and 1
-
-🎯 4. Loss Functions
-
-Defined in train.py.
-
-Binary Cross Entropy (BCE) Loss
-
-Good for pixel-wise classification.
-
-Dice Loss
-
-Measures overlap between predicted and true tumor region.
-
-✔ Combined Loss Used:
-Loss = 0.3 * BCE + 0.7 * Dice
-
-
-Dice gets higher weight since tumor pixels are much fewer than background pixels.
-
-📈 5. Training
-
-The training script (train.py) handles:
-
-✔ Hyperparameters
-
-Epochs: 60
-
-Batch size: 4
-
-Learning rate: 1e-4
-
-Optimizer: Adam
-
-✔ Validation
-
-Splits dataset:
-
-80% training
-20% validation
-
-✔ Best Model Saving
-
-Automatically saves:
-
-checkpoints/best_unet.pth
-
-✔ Outputs
-
-Loss curves
-
-Predicted masks saved every 5 epochs
-
-📊 6. Evaluation
-
-Using evaluate.py.
-
-Metrics computed:
-
-Dice Score
-
-IoU (Jaccard Index)
-
-Pixel Accuracy
-
-Validation BCE Loss
-
-Saved graphs:
-
-eval_val_loss.png
-eval_metrics_curve.png
-
-🔍 7. Test on New MRI Images
-
-Run:
-
-python test_images.py
-
-
-This script:
-
-Loads trained model
-
-Preprocesses MRI
-
-Predicts mask
-
-Saves output mask
-
-Displays MRI, Ground Truth, Predicted Mask
-
-📉 8. Plot Training Loss from Log File
-
-plot_loss_from_txt.py extracts training + validation loss from a .txt file and plots them.
-
-Useful for:
-
-Reports
-
-Performance comparison
-
-▶️ How to Run the Project
-Train
+├── model.py
+├── dataset.py
+├── preprocessing.py
+├── train.py
+├── evaluate.py
+├── test_images.py
+├── test_dataset.py
+├── plot_loss_from_txt.py
+├── checkpoints/
+└── results_training/
+```
+
+## Run Locally
+
+```bash
+git clone https://github.com/your-username/BrainSeg
+cd BrainSeg
+python -m venv .venv
+.venv\Scripts\activate
+pip install torch torchvision opencv-python matplotlib albumentations numpy tqdm scikit-image
+```
+
+**Train**
+
+```bash
 python train.py
+```
 
-Evaluate
+**Evaluate**
+
+```bash
 python evaluate.py
+```
 
-Predict on new MRI
+**Predict on new MRI**
+
+```bash
 python test_images.py
+```
 
-Test dataset integrity
+**Test dataset integrity**
+
+```bash
 python test_dataset.py
+```
 
-🧩 Installation
+## Training Configuration
 
-Install dependencies:
+| Hyperparameter  | Value     |
+| --------------- | --------- |
+| Epochs          | 60        |
+| Batch Size      | 4         |
+| Learning Rate   | 1e-4      |
+| Optimizer       | Adam      |
+| Train/Val Split | 80% / 20% |
 
-pip install torch torchvision opencv-python matplotlib albumentations numpy tqdm scikit-image python-pptx
+## Architecture — U-Net
 
-📌 Future Improvements
+```
+Input MRI
+    ↓
+Encoder        → Conv → Conv → MaxPool (×4)
+    ↓
+Bottleneck     → high-level feature extraction
+    ↓
+Decoder        → Upsample + Skip Connections (×4)
+    ↓
+Output Layer   → 1-channel mask via Sigmoid
+```
 
-Use 3D U-Net for volumetric MRI segmentation
+## Future Improvements
 
-Add tumor classification stage
+- 3D U-Net for volumetric MRI segmentation
+- Tumor classification stage on top of segmentation
+- Web deployment via Flask or FastAPI
+- Transformer-based models (UNetR, SegFormer)
 
-Deploy as a web application (Flask / FastAPI)
+---
 
-Apply transformer-based segmentation models (UNetR, SegFormer)
-
-
-📜 License
-
-This work is for educational and research purposes only.
-Not intended for clinical diagnosis.
+_Built for educational and research purposes only. Not intended for clinical diagnosis._
